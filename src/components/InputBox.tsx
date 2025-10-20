@@ -71,10 +71,6 @@ export const InputBox = ({ onSend, disabled }: InputBoxProps) => {
             </Button>
           </div>
         </div>
-        
-        <div className="mt-2 text-center text-xs text-muted-foreground">
-          Tomo can make mistakes. Consider checking important information.
-        </div>
       </div>
     </div>
   );
