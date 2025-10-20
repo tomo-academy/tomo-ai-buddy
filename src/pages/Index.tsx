@@ -3,6 +3,8 @@ import { Sidebar } from "@/components/Sidebar";
 import { ChatWindow } from "@/components/ChatWindow";
 import { InputBox } from "@/components/InputBox";
 import { SettingsPanel } from "@/components/SettingsPanel";
+import { streamChat, type Message as StreamMessage } from "@/utils/streamChat";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -39,16 +41,41 @@ const Index = () => {
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Simulate AI response (replace with actual API call)
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: "assistant",
-        content: "MEOW! Thanks for chatting with me! I'm Tomo, your AI companion. While I'm not connected to a backend yet, I'm ready to help once you set up the integration. What would you like to talk about?",
-      };
-      setMessages((prev) => [...prev, aiMessage]);
+    let assistantSoFar = "";
+    const assistantId = (Date.now() + 1).toString();
+
+    const upsertAssistant = (nextChunk: string) => {
+      assistantSoFar += nextChunk;
+      setMessages((prev) => {
+        const last = prev[prev.length - 1];
+        if (last?.role === "assistant" && last.id === assistantId) {
+          return prev.map((m) => (m.id === assistantId ? { ...m, content: assistantSoFar } : m));
+        }
+        return [...prev, { id: assistantId, role: "assistant", content: assistantSoFar }];
+      });
+    };
+
+    try {
+      const streamMessages: StreamMessage[] = [...messages, userMessage].map(m => ({ 
+        role: m.role, 
+        content: m.content 
+      }));
+
+      await streamChat({
+        messages: streamMessages,
+        onDelta: (chunk) => upsertAssistant(chunk),
+        onDone: () => setIsLoading(false),
+        onError: (error) => {
+          console.error("Stream error:", error);
+          setIsLoading(false);
+          toast.error(error);
+        },
+      });
+    } catch (e) {
+      console.error(e);
       setIsLoading(false);
-    }, 1000);
+      toast.error("Failed to send message");
+    }
   };
 
   const handleNewChat = () => {
