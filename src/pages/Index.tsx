@@ -1,10 +1,11 @@
-import { useState } from "react";
-import { Sidebar } from "@/components/Sidebar";
-import { ChatWindow } from "@/components/ChatWindow";
-import { InputBox } from "@/components/InputBox";
-import { SettingsPanel } from "@/components/SettingsPanel";
+import { useState, useEffect } from "react";
+import { ChatHeader } from "@/components/ChatHeader";
+import { ModernChatWindow } from "@/components/ModernChatWindow";
+import { ModernInputBox } from "@/components/ModernInputBox";
+import { ModernSidebar } from "@/components/ModernSidebar";
 import { streamChat, type Message as StreamMessage } from "@/utils/streamChat";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 interface Message {
   id: string;
@@ -21,15 +22,19 @@ interface ChatHistory {
 const Index = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [chatHistory, setChatHistory] = useState<ChatHistory[]>([
-    { id: "1", title: "Welcome Chat", timestamp: new Date() },
+    { id: "1", title: "New Chat", timestamp: new Date() },
   ]);
   const [activeChat, setActiveChat] = useState<string>("1");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+  const isMobile = useIsMobile();
 
-  // Settings state
-  const [model, setModel] = useState("tomogrok-4");
-  const [temperature, setTemperature] = useState(0.7);
-  const [maxTokens, setMaxTokens] = useState(1024);
+  // Close sidebar on mobile by default
+  useEffect(() => {
+    if (isMobile) {
+      setIsSidebarOpen(false);
+    }
+  }, [isMobile]);
 
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
@@ -40,6 +45,16 @@ const Index = () => {
 
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
+
+    // Update chat title if it's the first message
+    if (messages.length === 0) {
+      const title = content.slice(0, 30) + (content.length > 30 ? "..." : "");
+      setChatHistory((prev) =>
+        prev.map((chat) =>
+          chat.id === activeChat ? { ...chat, title } : chat
+        )
+      );
+    }
 
     let assistantSoFar = "";
     const assistantId = (Date.now() + 1).toString();
@@ -56,9 +71,9 @@ const Index = () => {
     };
 
     try {
-      const streamMessages: StreamMessage[] = [...messages, userMessage].map(m => ({ 
-        role: m.role, 
-        content: m.content 
+      const streamMessages: StreamMessage[] = [...messages, userMessage].map((m) => ({
+        role: m.role,
+        content: m.content,
       }));
 
       await streamChat({
@@ -81,7 +96,7 @@ const Index = () => {
   const handleNewChat = () => {
     const newChat: ChatHistory = {
       id: Date.now().toString(),
-      title: `Chat ${chatHistory.length + 1}`,
+      title: "New Chat",
       timestamp: new Date(),
     };
     setChatHistory((prev) => [newChat, ...prev]);
@@ -91,38 +106,29 @@ const Index = () => {
 
   const handleSelectChat = (id: string) => {
     setActiveChat(id);
-    // In a real app, load messages for this chat
     setMessages([]);
   };
 
-  const handleOpenSettings = () => {
-    // Settings panel is always visible in this layout
-    console.log("Settings panel is always visible");
+  const toggleSidebar = () => {
+    setIsSidebarOpen((prev) => !prev);
   };
 
   return (
-    <div className="flex h-screen bg-background">
-      <Sidebar
-        onNewChat={handleNewChat}
+    <div className="flex h-screen bg-background overflow-hidden">
+      <ModernSidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
         onSelectChat={handleSelectChat}
-        onOpenSettings={handleOpenSettings}
         chatHistory={chatHistory}
         activeChat={activeChat}
+        isMobile={isMobile}
       />
 
-      <div className="flex-1 flex flex-col">
-        <ChatWindow messages={messages} isLoading={isLoading} />
-        <InputBox onSend={handleSendMessage} disabled={isLoading} />
+      <div className="flex-1 flex flex-col min-w-0">
+        <ChatHeader onToggleSidebar={toggleSidebar} onNewChat={handleNewChat} />
+        <ModernChatWindow messages={messages} isLoading={isLoading} />
+        <ModernInputBox onSend={handleSendMessage} disabled={isLoading} />
       </div>
-
-      <SettingsPanel
-        model={model}
-        temperature={temperature}
-        maxTokens={maxTokens}
-        onModelChange={setModel}
-        onTemperatureChange={setTemperature}
-        onMaxTokensChange={setMaxTokens}
-      />
     </div>
   );
 };

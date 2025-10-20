@@ -9,38 +9,37 @@ All colors MUST be HSL.
 @layer base {
   :root {
     --background: 0 0% 100%;
-    --foreground: 0 0% 0%;
+    --foreground: 0 0% 13%;
 
     --card: 0 0% 100%;
-    --card-foreground: 0 0% 0%;
+    --card-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 0%;
+    --popover-foreground: 0 0% 13%;
 
-    --primary: 203 89% 53%;
+    --primary: 0 0% 13%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 0%;
+    --secondary-foreground: 0 0% 13%;
 
     --muted: 0 0% 96%;
     --muted-foreground: 0 0% 45%;
 
-    --accent: 203 89% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 96%;
+    --accent-foreground: 0 0% 13%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
     --border: 0 0% 90%;
     --input: 0 0% 90%;
-    --ring: 203 89% 53%;
+    --ring: 0 0% 13%;
 
-    --radius: 0.75rem;
+    --radius: 0.5rem;
     
-    --tomo-blue: 203 89% 53%;
-    --tomo-dark: 210 11% 7%;
-    --chat-bg: 0 0% 98%;
+    --chat-user: 236 93% 96%;
+    --chat-assistant: 0 0% 100%;
 
     --sidebar-background: 0 0% 98%;
 
@@ -60,37 +59,36 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
+    --background: 0 0% 13%;
+    --foreground: 0 0% 95%;
 
-    --card: 210 11% 7%;
-    --card-foreground: 0 0% 100%;
+    --card: 0 0% 13%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 210 11% 7%;
-    --popover-foreground: 0 0% 100%;
+    --popover: 0 0% 13%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 203 89% 53%;
-    --primary-foreground: 0 0% 100%;
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 13%;
 
-    --secondary: 210 11% 15%;
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 0 0% 20%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 210 11% 15%;
+    --muted: 0 0% 20%;
     --muted-foreground: 0 0% 60%;
 
-    --accent: 203 89% 53%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 0 0% 20%;
+    --accent-foreground: 0 0% 95%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 210 11% 15%;
-    --input: 210 11% 15%;
-    --ring: 203 89% 53%;
+    --border: 0 0% 20%;
+    --input: 0 0% 20%;
+    --ring: 0 0% 95%;
     
-    --tomo-blue: 203 89% 53%;
-    --tomo-dark: 210 11% 7%;
-    --chat-bg: 0 0% 5%;
+    --chat-user: 0 0% 18%;
+    --chat-assistant: 0 0% 13%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -110,5 +108,21 @@ All colors MUST be HSL.
   body {
     @apply bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  pre {
+    @apply bg-muted rounded-lg p-4 overflow-x-auto my-4;
+  }
+
+  code {
+    @apply text-sm font-mono;
+  }
+
+  pre code {
+    @apply bg-transparent p-0;
+  }
+
+  :not(pre) > code {
+    @apply bg-muted px-1.5 py-0.5 rounded text-sm;
   }
 }
