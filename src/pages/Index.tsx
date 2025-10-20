@@ -11,6 +11,7 @@ interface Message {
   id: string;
   role: "user" | "assistant";
   content: string;
+  thinking?: string;
 }
 
 interface ChatHistory {
@@ -36,6 +37,17 @@ const Index = () => {
     }
   }, [isMobile]);
 
+  const generateThinkingProcess = (userMessage: string) => {
+    // Simulate thinking process based on the query
+    const thinkingSteps = [
+      "Understanding the user's question and context...",
+      "Analyzing relevant information and approaches...",
+      "Considering the most effective way to respond...",
+      "Formulating a clear and helpful answer...",
+    ];
+    return thinkingSteps.join("\n\n");
+  };
+
   const handleSendMessage = async (content: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -56,6 +68,9 @@ const Index = () => {
       );
     }
 
+    // Generate thinking process
+    const thinking = generateThinkingProcess(content);
+
     let assistantSoFar = "";
     const assistantId = (Date.now() + 1).toString();
 
@@ -64,9 +79,18 @@ const Index = () => {
       setMessages((prev) => {
         const last = prev[prev.length - 1];
         if (last?.role === "assistant" && last.id === assistantId) {
-          return prev.map((m) => (m.id === assistantId ? { ...m, content: assistantSoFar } : m));
+          return prev.map((m) => 
+            m.id === assistantId 
+              ? { ...m, content: assistantSoFar, thinking } 
+              : m
+          );
         }
-        return [...prev, { id: assistantId, role: "assistant", content: assistantSoFar }];
+        return [...prev, { 
+          id: assistantId, 
+          role: "assistant", 
+          content: assistantSoFar,
+          thinking 
+        }];
       });
     };
 
