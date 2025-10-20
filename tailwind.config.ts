@@ -13,7 +13,13 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+      },
       colors: {
+        'tomo-blue': 'hsl(var(--tomo-blue))',
+        'tomo-dark': 'hsl(var(--tomo-dark))',
+        'chat-bg': 'hsl(var(--chat-bg))',
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
